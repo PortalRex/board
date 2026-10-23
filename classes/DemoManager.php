@@ -18,9 +18,9 @@ class DemoManager {
             ]
         );
 
-        $dir = (new DateTime($row["time_gained"]))->format('Y/m');
+        $dir = (new DateTime($row["time_gained"] ?? ""))->format('Y/m');
 
-        $map = str_replace(" ", "" , $GLOBALS["mapInfo"]["maps"][$row["map_id"]]["mapName"]);
+        $map = str_replace(" ", "" , $GLOBALS["mapInfo"]["maps"][$row["map_id"]]["mapName"] ?? "");
 
         return [
             $dir,

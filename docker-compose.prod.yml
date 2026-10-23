@@ -18,7 +18,7 @@ services:
       - /var/mel/docker/logs/error.log:/var/log/apache2/error.log
       - /var/mel/docker/logs/access.log:/var/log/apache2/other_vhosts_access.log
       - /var/mel/docker/logs/debug.txt:/var/www/html/debug.txt
-      - /var/mel/docker/php/board.ini:/etc/php/8.1/apache2/conf.d/board.ini
+      - /var/mel/docker/php/board.ini:/usr/local/etc/php/conf.d/board.ini
       - /var/mel/docker/volumes/cache:/var/www/html/cache
       - /var/mel/docker/volumes/demos:/var/www/html/demos
       - /var/mel/docker/volumes/sessions:/var/www/html/sessions

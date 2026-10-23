@@ -258,7 +258,7 @@ class Leaderboard
                 $xml = microtime(true);
 
                 try {
-                    $mapLeaderboard = simplexml_load_string(utf8_encode($xmlContent));
+                    $mapLeaderboard = simplexml_load_string(mb_convert_encoding($xmlContent, 'UTF-8', 'ISO-8859-1'));
                 } 
                 catch (Exception $e) {
                     throw new Exception("SimpleXML error: " . $e);
@@ -593,7 +593,7 @@ class Leaderboard
 
         foreach ($unsafe_parameters as $key => $val) {
             if (array_key_exists($key, $param)) {
-                $param[$key] = preg_replace("/[^a-zA-Z0-9]+\s/", "", $unsafe_parameters[$key]);
+                $param[$key] = preg_replace("/[^a-zA-Z0-9]+\s/", "", $unsafe_parameters[$key] ?? "");
             }
         }
 
@@ -695,7 +695,7 @@ class Leaderboard
             $board[$chapterId][$mapId][$profileNumber]["scoreData"]["youtubeID"] = $row["youtube_id"];
             $board[$chapterId][$mapId][$profileNumber]["scoreData"]["pending"] = $row["pending"];
             $board[$chapterId][$mapId][$profileNumber]["scoreData"]["autorender_id"] = $row["autorender_id"];
-            $board[$chapterId][$mapId][$profileNumber]["userData"]["boardname"] = htmlspecialchars($row["boardname"]);
+            $board[$chapterId][$mapId][$profileNumber]["userData"]["boardname"] = htmlspecialchars($row["boardname"] ?? "");
             $board[$chapterId][$mapId][$profileNumber]["userData"]["avatar"] = $row["avatar"];
         }
 
@@ -808,7 +808,7 @@ class Leaderboard
             $board[$idx]["scoreData"]["autorenderId"] = $row["autorender_id"];
             $board[$idx]["scoreData"]["mapId"] = $row["mapid"];
             $board[$idx]["scoreData"]["chapterId"] = $row["chapterid"];
-            $board[$idx]["userData"]["boardname"] = htmlspecialchars($row["boardname"]);
+            $board[$idx]["userData"]["boardname"] = htmlspecialchars($row["boardname"] ?? "");
             $board[$idx]["userData"]["avatar"] = $row["avatar"];
             $board[$idx]["userData"]["profileNumber"] = $row["profile_number"];
             ++$idx;
@@ -855,7 +855,7 @@ class Leaderboard
 
         foreach ($unsafe_parameters as $key => $val) {
             if (array_key_exists($key, $param)) {
-                $param[$key] = preg_replace("/[^a-zA-Z0-9]+\s/", "", $unsafe_parameters[$key]);
+                $param[$key] = preg_replace("/[^a-zA-Z0-9]+\s/", "", $unsafe_parameters[$key] ?? "");
             }
         }
 
@@ -995,7 +995,7 @@ class Leaderboard
 
         $changelog = array();
         while ($row = $changelog_data->fetch_assoc()) {
-            $row["player_name"] = htmlspecialchars($row["player_name"]);
+            $row["player_name"] = htmlspecialchars($row["player_name"] ?? "");
             $row["note"] = $row["note"] != NULL ? htmlspecialchars($row["note"]) : NULL;
 
             $row["improvement"] = null;
@@ -1150,7 +1150,7 @@ class Leaderboard
 
     public static function roundBoardScores($board) {
         foreach ($board as $profileNumber => $playerData) {
-            $board[$profileNumber]["scoreData"]["score"] = round($playerData["scoreData"]["score"]);
+            $board[$profileNumber]["scoreData"]["score"] = Util::roundSum($playerData["scoreData"]["score"]);
         }
         return $board;
     }
@@ -1299,8 +1299,9 @@ class Leaderboard
         $nicknames = [];
 
         while ($row = $data->fetch_assoc()) {
-            $nickname = str_replace(" ", "", $row["nickname"]);
-            if (strlen($row["nickname"])) {
+            // No nickname is NULL; PHP 8.1 deprecates passing NULL to string functions.
+            $nickname = str_replace(" ", "", $row["nickname"] ?? "");
+            if (strlen($row["nickname"] ?? "")) {
                 $nicknames[$row["profile_number"]] = $nickname;
                 $profileNumbers[strtolower($nickname)] = $row["profile_number"];
             }
@@ -1573,7 +1574,7 @@ class Leaderboard
             $diff = abs($score - $oldChamberBoard[$keys[0]]["scoreData"]["score"]);
         }
 
-        $comment = Database::getMysqli()->real_escape_string($comment);
+        $comment = Database::getMysqli()->real_escape_string($comment ?? "");
         $preRank = isset($oldChamberBoard[$profileNumber])
             ? $oldChamberBoard[$profileNumber]["scoreData"]["playerRank"]
             : null;
