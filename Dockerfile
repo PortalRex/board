@@ -28,6 +28,10 @@ COPY . .
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 RUN mkdir -p cache demos sessions /etc/apache2/ssl
 RUN chown -R www-data:www-data .
+# The official image makes /var/www/html world-writable with the sticky bit (1777). With the kernel's
+# fs.protected_regular, www-data then can't append to files it doesn't own there, like a mounted
+# debug.txt. It owns the folder, so it needs no more than 755.
+RUN chmod 755 /var/www/html
 
 RUN ln -s /etc/apache2/sites-available/${SERVER_NAME}.conf /etc/apache2/sites-enabled/${SERVER_NAME}.conf
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
